@@ -9,44 +9,9 @@
             font-family: Arial, sans-serif;
             background-color: #f4f6f8;
         }
-        header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            background: linear-gradient(to right, #4a90e2, #357abd);
-            color: white;
-            padding: 10px 20px;
-        }
-        .logo-section {
-            display: flex;
-            align-items: center;
-        }
-        .logo-section img {
-            width: 60px;
-            height: 60px;
-            margin-right: 15px;
-            border-radius: 50%;
-            background: white;
-            padding: 5px;
-        }
-        nav a {
-            color: white;
-            text-decoration: none;
-            margin: 0 10px;
-            font-weight: bold;
-        }
-        nav a:hover {
-            text-decoration: underline;
-            color: #ffd166;
-        }
-        h2 {
-            color: #357abd;
-            text-align: center;
-            margin: 20px 0;
-        }
         table {
             width: 90%;
-            margin: auto;
+            margin: 40px auto;
             border-collapse: collapse;
             background: white;
             box-shadow: 0 4px 8px rgba(0,0,0,0.05);
@@ -97,11 +62,14 @@
         .remove-btn:hover {
             background-color: darkred;
         }
+        input[type="number"] {
+            width: 60px;
+            padding: 5px;
+            text-align: center;
+        }
     </style>
 </head>
 <body>
-
-<h2>Your Shopping Cart</h2>
 
 <table id="cartTable">
     <tr>
@@ -116,7 +84,7 @@
         <td>CSE</td>
         <td>XML Bible</td>
         <td class="price">₹40.50</td>
-        <td>1</td>
+        <td><input type="number" value="1" min="1" onchange="updateAmount(this)"></td>
         <td class="price">₹40.50</td>
         <td><button class="remove-btn" onclick="removeItem(this)">Remove</button></td>
     </tr>
@@ -124,7 +92,7 @@
         <td>ECE</td>
         <td>Artificial Intelligence</td>
         <td class="price">₹63.00</td>
-        <td>2</td>
+        <td><input type="number" value="2" min="1" onchange="updateAmount(this)"></td>
         <td class="price">₹126.00</td>
         <td><button class="remove-btn" onclick="removeItem(this)">Remove</button></td>
     </tr>
@@ -138,22 +106,36 @@
 <button class="checkout-btn" onclick="window.location.href='payment.html'">Proceed to Checkout</button>
 
 <script>
+    function updateAmount(input) {
+        const row = input.parentElement.parentElement;
+        const priceCell = row.cells[2];
+        const amountCell = row.cells[4];
+
+        let price = parseFloat(priceCell.innerText.replace('₹', ''));
+        let quantity = parseInt(input.value);
+
+        let newAmount = price * quantity;
+        amountCell.innerText = `₹${newAmount.toFixed(2)}`;
+
+        updateTotal();
+    }
+
+    function updateTotal() {
+        const table = document.getElementById('cartTable');
+        let total = 0;
+        for (let i = 1; i < table.rows.length - 1; i++) {
+            let amountText = table.rows[i].cells[4].innerText.replace('₹', '');
+            total += parseFloat(amountText);
+        }
+        document.getElementById('totalAmount').innerText = `₹${total.toFixed(2)}`;
+    }
+
     function removeItem(button) {
         const row = button.parentElement.parentElement;
-        const amountCell = row.cells[4];
-        let amount = parseFloat(amountCell.innerText.replace('₹', ''));
-
-        // Remove row
         row.remove();
-
-        // Update total
-        const totalElement = document.getElementById('totalAmount');
-        let currentTotal = parseFloat(totalElement.innerText.replace('₹', ''));
-        let newTotal = currentTotal - amount;
-        totalElement.innerText = `₹${newTotal.toFixed(2)}`;
+        updateTotal();
     }
 </script>
 
 </body>
 </html>
-
